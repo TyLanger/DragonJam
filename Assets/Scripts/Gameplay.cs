@@ -26,15 +26,21 @@ public class Gameplay : MonoBehaviour {
 		// need to survive for timeToSurvive seconds
 		// when the time ends, need to kill the remaining enemies
 		public float timeToSurvive;
+		public float originalTimeToSurvive;
+		public float survivalTimeBetweenSpawns;
+		public AnimationCurve lightIntensity;
 		int enemiesLeftToKill;
 
 	};
+
+
 		
 	public GameObject player;
 	public GameObject pirate;
 	public GameObject alien;
 	public GameObject ocean;
 	public GameObject wayPoint;
+	public Light sunLight;
 
 	float timeOfNextSpawn = 0;
 	float timeBetweenSpawns = 10;
@@ -70,10 +76,12 @@ public class Gameplay : MonoBehaviour {
 		}
 
 		if (gameStages [currentStage].winState == WinState.Survival) {
+			sunLight.intensity = gameStages[currentStage].lightIntensity.Evaluate((gameStages [currentStage].timeToSurvive/gameStages[currentStage].originalTimeToSurvive));
+			gameStages [currentStage].timeToSurvive -= Time.deltaTime;
 			if (gameStages [currentStage].timeToSurvive < 0) {
 				advanceLevel ();
 			}
-			gameStages [currentStage].timeToSurvive -= Time.deltaTime;
+
 		}
 	}
 
@@ -89,9 +97,19 @@ public class Gameplay : MonoBehaviour {
 			signZ = 1;
 		}
 		Vector3 randomSpawn = new Vector3 (Random.Range (15, 20) * signX, 0, Random.Range (15, 20) * signZ);
-		var copy = Instantiate (pirate, player.transform.position + randomSpawn, transform.rotation);
-		copy.GetComponent<BoatController> ().ocean = ocean;
-		copy.GetComponent<Health> ().OnDeath += DeadEnemy;
+		if (currentStage > 1 && Random.Range(0, 5) == 0) {
+			// only spawn aliens once the player is past the first 2 stages (start and elimination)
+			// random(0,5) == 0 gives a 1/5 chance that the enemy spawned is an alien
+			//spawn an alien sometimes
+			var alienCopy = Instantiate(alien, player.transform.position + randomSpawn, transform.rotation);
+			alienCopy.GetComponent<AlienController> ().ocean = ocean;
+			alienCopy.GetComponent<Health> ().OnDeath += DeadEnemy;
+		} else {
+			var copy = Instantiate (pirate, player.transform.position + randomSpawn, transform.rotation);
+			copy.GetComponent<BoatController> ().ocean = ocean;
+			copy.GetComponent<Health> ().OnDeath += DeadEnemy;
+		}
+
 	}
 
 	void DeadEnemy()
@@ -122,6 +140,7 @@ public class Gameplay : MonoBehaviour {
 
 		case WinState.aToB:
 			// set point a to the player's position
+			// Don't really use this for anything... but it is useful for debugging
 			gameStages [currentStage].pointA = player.transform.position;
 			// create a waypoint in the world at the specified point relative to the player's current position
 			var wayClone = Instantiate (wayPoint, player.transform.position + gameStages [currentStage].pointB, transform.rotation);
@@ -131,7 +150,8 @@ public class Gameplay : MonoBehaviour {
 			break;
 
 		case WinState.Survival:
-
+			timeBetweenSpawns = gameStages [currentStage].survivalTimeBetweenSpawns;
+			gameStages [currentStage].originalTimeToSurvive = gameStages[currentStage].timeToSurvive;
 			break;
 
 		case WinState.End:

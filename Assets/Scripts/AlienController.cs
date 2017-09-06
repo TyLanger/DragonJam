@@ -28,6 +28,9 @@ public class AlienController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		if (player == null) {
+			player = FindObjectOfType<CharacterController> ().gameObject;
+		}
 		playerController = player.GetComponent<BoatController> ();
 		GetComponent<Health> ().OnDeath += dieFromDamage;
 	}
@@ -74,12 +77,14 @@ public class AlienController : MonoBehaviour {
 
 	void abduct()
 	{
+		// try to abduct a crew member if the player has one
 		// tow the crew member below the space craft
-		playerController.loseCrew ();
-		haveCrew = true;
-		var crewCopy = Instantiate(crew, visual.transform.position + new Vector3(0, -1.5f, 0), transform.rotation);
-		crewCopy.transform.parent = visual.transform;
-		crew = crewCopy;
+		if (playerController.loseCrew ()) {
+			haveCrew = true;
+			var crewCopy = Instantiate (crew, visual.transform.position + new Vector3 (0, -1.5f, 0), transform.rotation);
+			crewCopy.transform.parent = visual.transform;
+			crew = crewCopy;
+		}
 	}
 
 	void dieFromDamage()
