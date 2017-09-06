@@ -1,17 +1,28 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Gameplay : MonoBehaviour {
 
 	public enum WinState {Start, Elimination, aToB, Survival, End};
 
+
+	// This struct may be entirely useless
+	// there is almost no overlap of variables between states
+	// this could all be accomplished with one WinState
+	// WinState currentStage
+	// And all these variables jsut become a part of Gameplay.cs once
+	// Changing this would mean I would have to fill out all those fields again
+	// Only thing that overlaps is the messages
+	// Probably jsut keep this for now, but next time could be done much better
 	[System.Serializable]
 	public struct GameStage {
 
 		public WinState winState;
 
 		public string stateMessage;
+		public string tipMessage;
 		public string winMessage;
 
 		// the game spawns enemies and you need to kill them
@@ -41,6 +52,7 @@ public class Gameplay : MonoBehaviour {
 	public GameObject ocean;
 	public GameObject wayPoint;
 	public Light sunLight;
+	public Text uiText;
 
 	float timeOfNextSpawn = 0;
 	float timeBetweenSpawns = 10;
@@ -50,6 +62,7 @@ public class Gameplay : MonoBehaviour {
 
 	public GameStage[] gameStages;
 	int currentStage = 0;
+	bool tipDisplayed = false;
 
 	// Use this for initialization
 	void Start () {
@@ -65,6 +78,7 @@ public class Gameplay : MonoBehaviour {
 				// right now, elimination only works for 1 enemy type
 				if ((gameStages [currentStage].winState == WinState.Elimination) && (gameStages [currentStage].enemiesToKill [0] <= numSpawnedEnemies)) {
 					// all the enemies for elimination have been spawned
+
 					if (numDeadEnemies == gameStages [currentStage].enemiesToKill [0]) {
 						advanceLevel ();
 					}
@@ -74,14 +88,30 @@ public class Gameplay : MonoBehaviour {
 				}
 			}
 		}
-
+		if (gameStages [currentStage].winState == WinState.Elimination) {
+			if ((numDeadEnemies == (gameStages [currentStage].enemiesToKill [0] - 3)) && !tipDisplayed) {
+				printMessage (gameStages [currentStage].tipMessage);
+				tipDisplayed = true;
+			}
+		}
 		if (gameStages [currentStage].winState == WinState.Survival) {
 			sunLight.intensity = gameStages[currentStage].lightIntensity.Evaluate((gameStages [currentStage].timeToSurvive/gameStages[currentStage].originalTimeToSurvive));
 			gameStages [currentStage].timeToSurvive -= Time.deltaTime;
+			if (gameStages [currentStage].timeToSurvive < 30 && !tipDisplayed) {
+				// print the tip message when only 30 seconds left
+				printMessage (gameStages [currentStage].tipMessage);
+				tipDisplayed = true;
+			}
 			if (gameStages [currentStage].timeToSurvive < 0) {
 				advanceLevel ();
 			}
+		}
 
+		if (gameStages [currentStage].winState == WinState.aToB && !tipDisplayed) {
+			if (Vector3.Distance (player.transform.position, gameStages [currentStage].pointB) < 50) {
+				printMessage (gameStages [currentStage].tipMessage);
+				tipDisplayed = true;
+			}
 		}
 	}
 
@@ -117,18 +147,25 @@ public class Gameplay : MonoBehaviour {
 		numDeadEnemies++;
 	}
 
+	void printMessage(string message)
+	{
+		// prints the message to the screen
+		uiText.text = message;
+		Debug.Log(message);
+	}
+
 	public void advanceLevel()
 	{
-		Debug.Log (gameStages [currentStage].winMessage);
+		printMessage (gameStages [currentStage].winMessage);
 		currentStage++;
-		Debug.Log (gameStages [currentStage].stateMessage);
+		printMessage (gameStages [currentStage].stateMessage);
 		initWinState ();
 	}
 
 	void initWinState()
 	{
 		WinState currentWinState = gameStages [currentStage].winState;
-
+		tipDisplayed = false;
 
 		switch (currentWinState) {
 
@@ -159,4 +196,5 @@ public class Gameplay : MonoBehaviour {
 			break;
 		}
 	}
+
 }
