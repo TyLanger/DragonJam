@@ -54,8 +54,11 @@ public class Gameplay : MonoBehaviour {
 	public GameObject wayPoint;
 	public Light sunLight;
 	public Text uiText;
+	public TextMesh crewText;
 	// waypoint for the arrows to show the way
 	public Waypoint arrow;
+	public Transform cameraTrans;
+
 
 	float timeOfNextSpawn = 0;
 	float timeBetweenSpawns = 10;
@@ -101,7 +104,7 @@ public class Gameplay : MonoBehaviour {
 		if (gameStages [currentStage].winState == WinState.Elimination) {
 			if ((numDeadEnemies == (gameStages [currentStage].enemiesToKill [0] - 3)) && !tipDisplayed) {
 				
-				printMessage (gameStages [currentStage].tipMessage);
+				shoutMessage (gameStages [currentStage].tipMessage);
 				tipDisplayed = true;
 			}
 		}
@@ -110,7 +113,7 @@ public class Gameplay : MonoBehaviour {
 			gameStages [currentStage].timeToSurvive -= Time.deltaTime;
 			if (gameStages [currentStage].timeToSurvive < 30 && !tipDisplayed) {
 				// print the tip message when only 30 seconds left
-				printMessage (gameStages [currentStage].tipMessage);
+				shoutMessage (gameStages [currentStage].tipMessage);
 				tipDisplayed = true;
 			}
 			if (gameStages [currentStage].timeToSurvive < 0) {
@@ -120,7 +123,7 @@ public class Gameplay : MonoBehaviour {
 
 		if (gameStages [currentStage].winState == WinState.aToB && !tipDisplayed) {
 			if (Vector3.Distance (player.transform.position, gameStages [currentStage].pointB) < 50) {
-				printMessage (gameStages [currentStage].tipMessage);
+				shoutMessage (gameStages [currentStage].tipMessage);
 				tipDisplayed = true;
 			}
 		}
@@ -173,13 +176,22 @@ public class Gameplay : MonoBehaviour {
 	void printMessage(string message)
 	{
 		// prints the message to the screen
+		// this is for game info
 		uiText.text = message;
 		Debug.Log(message);
 	}
 
+	void shoutMessage(string message)
+	{
+		// shout the message as if the crew are saying it
+		// this is for more flavour text
+		var textCopy = Instantiate(crewText, player.transform.position, cameraTrans.rotation);
+		textCopy.text = message;
+	}
+
 	public void advanceLevel()
 	{
-		printMessage (gameStages [currentStage].winMessage);
+		shoutMessage (gameStages [currentStage].winMessage);
 		currentStage++;
 		printMessage (gameStages [currentStage].stateMessage);
 		initWinState ();

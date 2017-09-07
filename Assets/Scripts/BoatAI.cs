@@ -51,6 +51,7 @@ public class BoatAI : MonoBehaviour {
 		Debug.Log ("Spawning crew");
 		var crewCopy = Instantiate (crew, transform.position, transform.rotation);
 		crewCopy.GetComponent<Crew> ().drop ();
+
 	}
 
 	void stopMoving()

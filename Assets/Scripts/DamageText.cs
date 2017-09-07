@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DamageText : MonoBehaviour {
 
-	float fade = 0.01f;
+	public float fade = 0.01f;
 	TextMesh textMesh;
 
 	// Use this for initialization

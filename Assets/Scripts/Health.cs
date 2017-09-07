@@ -49,10 +49,9 @@ public class Health : MonoBehaviour {
 			clone.color = Color.green;
 			// remove the - from the string
 			clone.text = "+" + damage.ToString ().Substring(1);
-				if(addWord)
-				{
-				clone.text += " " + healWords[Random.Range(0, healWords.Length)];
-				}
+			if (addWord) {
+				clone.text += " " + healWords [Random.Range (0, healWords.Length)];
+			}
 			clone.transform.localScale = Vector3.one;
 		}
 		if (addWord) {
