@@ -52,4 +52,24 @@ public class CameraController : MonoBehaviour {
 		}
 		return false;
 	}
+
+	public bool isOffScreen(Vector3 pos)
+	{
+		// this could be just
+		// return A || B || C || D
+		// but that would be really long and maybe hard to read
+		if (pos.x > transform.position.x + horizontalDistance) {
+			return true;
+		}
+		else if (pos.x < transform.position.x - horizontalDistance) {
+			return true;
+		}
+		else if (pos.z < transform.position.z + verticalNearFarDistance.x) {
+			return true;
+		}
+		else if (pos.z > transform.position.z + verticalNearFarDistance.y) {
+			return true;
+		}
+		return false;
+	}
 }
