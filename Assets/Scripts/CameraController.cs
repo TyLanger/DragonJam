@@ -58,16 +58,19 @@ public class CameraController : MonoBehaviour {
 		// this could be just
 		// return A || B || C || D
 		// but that would be really long and maybe hard to read
+		// the horizontal edges used for the camera follow speed are good enough for this purpose too
+		// the vertical distances are a little bit off
+		// Just hard coding some numbers that look right
 		if (pos.x > transform.position.x + horizontalDistance) {
 			return true;
 		}
 		else if (pos.x < transform.position.x - horizontalDistance) {
 			return true;
 		}
-		else if (pos.z < transform.position.z + verticalNearFarDistance.x) {
+		else if (pos.z < transform.position.z + 1) {
 			return true;
 		}
-		else if (pos.z > transform.position.z + verticalNearFarDistance.y) {
+		else if (pos.z > transform.position.z + 30) {
 			return true;
 		}
 		return false;

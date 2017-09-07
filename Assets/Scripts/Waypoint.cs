@@ -14,7 +14,9 @@ public class Waypoint : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+		if (cameraController == null) {
+			cameraController = FindObjectOfType<CameraController> ();
+		}
 	}
 	
 	// Update is called once per frame
@@ -46,5 +48,20 @@ public class Waypoint : MonoBehaviour {
 	public void destroyArrow()
 	{
 		Destroy(gameObject);
+	}
+
+	public void setPlayer(GameObject p)
+	{
+		player = p;
+	}
+
+	public void setTarget(GameObject t)
+	{
+		target = t;
+		if (target.GetComponent<Health> () != null) {
+			// if the target has a health component,
+			// destroy this waypoint when it dies
+			target.GetComponent<Health> ().OnDeath += destroyArrow;
+		}
 	}
 }

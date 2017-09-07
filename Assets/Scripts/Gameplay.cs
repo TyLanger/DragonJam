@@ -50,15 +50,19 @@ public class Gameplay : MonoBehaviour {
 	public GameObject pirate;
 	public GameObject alien;
 	public GameObject ocean;
+	// waypoint for aToB
 	public GameObject wayPoint;
 	public Light sunLight;
 	public Text uiText;
+	// waypoint for the arrows to show the way
+	public Waypoint arrow;
 
 	float timeOfNextSpawn = 0;
 	float timeBetweenSpawns = 10;
 
 	int numSpawnedEnemies = 0;
 	public int numDeadEnemies;
+	bool waypointsNotSpawned = true;
 
 	public GameStage[] gameStages;
 	int currentStage = 0;
@@ -78,7 +82,13 @@ public class Gameplay : MonoBehaviour {
 				// right now, elimination only works for 1 enemy type
 				if ((gameStages [currentStage].winState == WinState.Elimination) && (gameStages [currentStage].enemiesToKill [0] <= numSpawnedEnemies)) {
 					// all the enemies for elimination have been spawned
-
+					if (waypointsNotSpawned) {
+						// use this condition so waypoints only get spawned once
+						// once all the enemies have been spwned for this stage,
+						// put waypoints on all remaining boats in case the player missed one and needs to find it
+						waypointsNotSpawned = false;
+						putWaypointsForRemainingEnemies ();
+					}
 					if (numDeadEnemies == gameStages [currentStage].enemiesToKill [0]) {
 						advanceLevel ();
 					}
@@ -90,6 +100,7 @@ public class Gameplay : MonoBehaviour {
 		}
 		if (gameStages [currentStage].winState == WinState.Elimination) {
 			if ((numDeadEnemies == (gameStages [currentStage].enemiesToKill [0] - 3)) && !tipDisplayed) {
+				
 				printMessage (gameStages [currentStage].tipMessage);
 				tipDisplayed = true;
 			}
@@ -142,6 +153,18 @@ public class Gameplay : MonoBehaviour {
 
 	}
 
+	void putWaypointsForRemainingEnemies ()
+	{
+		
+		BoatAI[] pirates = FindObjectsOfType<BoatAI> ();
+		Debug.Log (string.Format("Spawning {0} arrows", pirates.Length));
+		foreach (BoatAI boat in pirates) {
+			var arrowCopy = Instantiate (arrow.gameObject);
+			arrowCopy.GetComponent<Waypoint> ().setTarget (boat.gameObject);
+			arrowCopy.GetComponent<Waypoint> ().setPlayer (player);
+		}
+	}
+
 	void DeadEnemy()
 	{
 		numDeadEnemies++;
@@ -183,6 +206,9 @@ public class Gameplay : MonoBehaviour {
 			var wayClone = Instantiate (wayPoint, player.transform.position + gameStages [currentStage].pointB, transform.rotation);
 			wayClone.GetComponent<Island> ().ocean = ocean;
 			wayClone.GetComponent<Island> ().gameplay = this;
+			Waypoint arrowClone = Instantiate (arrow);
+			arrowClone.setPlayer (player);
+			arrowClone.setTarget (wayClone);
 
 			break;
 
