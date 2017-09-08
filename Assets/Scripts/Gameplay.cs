@@ -206,11 +206,8 @@ public class Gameplay : MonoBehaviour {
 		initWinState ();
 	}
 
-	public void resetLevel()
+	void killAllEnemies()
 	{
-		playerDead = true;
-
-		// kill all current enemies and restart the level
 		BoatAI[] enemyPirates = FindObjectsOfType<BoatAI> ();
 		if (enemyPirates != null) {
 			foreach (var boat in enemyPirates) {
@@ -227,6 +224,14 @@ public class Gameplay : MonoBehaviour {
 		if (spawnedIsland != null) {
 			spawnedIsland.resetIsland ();
 		}
+	}
+
+	public void resetLevel()
+	{
+		playerDead = true;
+
+		// kill all current enemies and restart the level
+		killAllEnemies();
 
 		// reset variables
 		waypointsNotSpawned = true;

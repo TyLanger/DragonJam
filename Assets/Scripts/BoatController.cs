@@ -27,6 +27,9 @@ public class BoatController : MonoBehaviour {
 	public GameObject visual;
 	public GameObject ocean;
 
+	string[] abductionMessages = { "They took ", "Crew down", "WTF", "I miss him already", "Get him back", "Aliens?!?!" };
+	string[] names = { "Larry", "One-eyed Pete", "New guy", "Henry", "Iron hook", "my dog", };
+	public TextMesh crewText;
 	public int numberOfCrew = 1;
 	public float fireSpeedBonusPerCrew;
 	public float accelerationBonusPerCrew;
@@ -180,6 +183,18 @@ public class BoatController : MonoBehaviour {
 		if (numberOfCrew > 0) {
 			numberOfCrew--;
 			// lose the crew
+			TextMesh crewMessageCopy = Instantiate(crewText, transform.position, FindObjectOfType<CameraController>().transform.rotation);
+			int randomMessage = Random.Range (0, abductionMessages.Length);
+			crewMessageCopy.text = abductionMessages [randomMessage];
+			if (randomMessage == 0) {
+				// add a name
+				int randomName = Random.Range(0, names.Length);
+				crewMessageCopy.text += names [randomName];
+			}
+
+			for (int i = 0; i < Random.Range (0, 4); i++) {
+				crewMessageCopy.text += "!";
+			}
 			// return true to say that there was a crew member to lose
 			return true;
 		}

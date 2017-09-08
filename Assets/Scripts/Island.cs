@@ -41,7 +41,7 @@ public class Island : MonoBehaviour {
 		// want the island to sink like all the enemies
 
 		// easy solution
-		Destroy(gameplay);
+		Destroy(gameObject);
 	}
 		
 }

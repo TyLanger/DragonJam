@@ -10,6 +10,8 @@ public class CharacterController : MonoBehaviour {
 	Vector3 aimPoint;
 	bool dead = false;
 
+
+
 	// Use this for initialization
 	void Start () {
 		GetComponent<Health> ().OnDeath += playerDeath;
