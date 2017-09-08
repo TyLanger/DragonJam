@@ -46,6 +46,12 @@ public class BoatAI : MonoBehaviour {
 		}
 	}
 
+	public void dieFromReset()
+	{
+		// called when the player dies
+		enemyAction = stopMoving;
+	}
+
 	void dropCrew()
 	{
 		Debug.Log ("Spawning crew");

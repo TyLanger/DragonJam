@@ -12,8 +12,9 @@ public class BoatController : MonoBehaviour {
 
 
 	bool sinking = false;
-	float sinkRate = 0.1f;
+	float sinkRate = 0.15f;
 	float sinkTime = 0;
+	Vector3 sinkVector;
 
 	public float turnSpeed;
 	float turnDirection;
@@ -39,6 +40,7 @@ public class BoatController : MonoBehaviour {
 	void Start () {
 		currentMoveSpeed = maxMoveSpeed;
 		health = GetComponent<Health> ();
+		sinkVector = new Vector3 (0, 1, 0);
 	}
 	
 	// Update is called once per frame
@@ -66,6 +68,19 @@ public class BoatController : MonoBehaviour {
 		// makes the boat ride the waves. The collider stays in the same y pos, however
 		// When the boat is sinking, makes it be slightly lower than the wave
 		visual.transform.position = transform.position + new Vector3 (0, ocean.GetComponent<Ocean> ().getHeightAtPosition (transform.position) + (sinking?-(sinkRate*(Time.time - sinkTime)):0), 0);
+		if (sinking) {
+			// cause the boat's front to turn to the sky
+			visual.transform.rotation = Quaternion.LookRotation (Vector3.RotateTowards (visual.transform.forward, transform.forward + sinkVector, Mathf.Abs(sinkRate*(Time.time - sinkTime)/10), 0.0f));
+			/*if (visual.transform.forward == transform.forward) {
+				
+				sinking = false;
+				Debug.Log ("Sinking = false");
+			}*/
+			/*if ((visual.transform.forward - transform.forward).magnitude < 0.01f) {
+				Debug.Log ("Close enough");
+
+			}*/
+		}
 
 		if (!health.isFullHealth ()) {
 			// heal a little bit every frame
@@ -86,6 +101,33 @@ public class BoatController : MonoBehaviour {
 		sinking = true;
 		sinkTime = Time.time;
 		Invoke ("destroyBoat", 8);
+	}
+
+	public void sinkPlayer()
+	{
+		sinking = true;
+		sinkTime = Time.time;
+		// don't destroy the boat
+		Invoke("rise", 8);
+	}
+
+	void rise()
+	{
+		// reset sinkTime or else the boat will bob back up at ta really fast rate
+		sinking = true;
+		sinkTime = Time.time;
+		sinkRate *= -1;
+		sinkVector = Vector3.zero;
+		Invoke ("stopRising", 2);
+	}
+	void stopRising()
+	{
+		Debug.Log ("Manual snap back");
+		// if it doesn't work itself out on its own
+		sinking = false;
+		sinkRate *= -1;
+		sinkVector = Vector3.up;
+		visual.transform.forward = transform.forward;
 	}
 
 	void destroyBoat()

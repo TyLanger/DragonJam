@@ -6,7 +6,9 @@ public class CharacterController : MonoBehaviour {
 
 
 	public BoatController boat;
+	public Gameplay gameplay;
 	Vector3 aimPoint;
+	bool dead = false;
 
 	// Use this for initialization
 	void Start () {
@@ -15,6 +17,9 @@ public class CharacterController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (dead) {
+			return;
+		}
 		boat.adjustThrottle (Input.GetAxisRaw ("Vertical"));
 		boat.steer (Input.GetAxisRaw ("Horizontal"));
 
@@ -37,5 +42,15 @@ public class CharacterController : MonoBehaviour {
 	void playerDeath()
 	{
 		Debug.Log ("You have died");
+		gameplay.resetLevel ();
+		boat.sinkPlayer ();
+		Invoke ("revive", 8);
+	}
+
+	void revive()
+	{
+		dead = false;
+		GetComponent<Health> ().revive ();
+		gameplay.playerRevived ();
 	}
 }

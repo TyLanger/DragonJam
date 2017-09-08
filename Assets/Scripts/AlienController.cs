@@ -102,6 +102,13 @@ public class AlienController : MonoBehaviour {
 		Invoke ("destroySelf", 8);
 	}
 
+	public void dieFromReset()
+	{
+		abducting = false;
+		maxMoveSpeed = 0;
+		Invoke ("destroySelf", 8);
+	}
+
 	void destroySelf()
 	{
 		Destroy (gameObject);

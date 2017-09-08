@@ -10,8 +10,9 @@ public class Health : MonoBehaviour {
 
 	public TextMesh damageText;
 
-	string[] damageWords = { "Boom", "Ouch", "Crash", "Fire", "More Fire", "Hit", "Damage", "Smash", "Thunk" };
-	string[] healWords = { "Heal", "Fixed", "Bandage Applied", "Hole Patched", "Fire out"};
+	string[] damageWords = { "Boom", "Ouch", "Crash", "Fire", "More Fire", "Hit", "Damage", "Smash", "Thunk", "We've been hit", "Sail torn", "Hole in the sail", "Mast broken"
+		 };
+	string[] healWords = { "Heal", "Fixed", "Bandage Applied", "Hole Patched", "Fire out", "Other fire out", "Sail repaired", "Deck swabbed", "Duct tape applied" };
 
 	Transform cameraTrans;
 
@@ -87,6 +88,12 @@ public class Health : MonoBehaviour {
 		if (OnDeath != null) {
 			OnDeath ();
 		}
+	}
+
+	public void revive()
+	{
+		dead = false;
+		currentHealth = maxHealth;
 	}
 
 	public bool isFullHealth()

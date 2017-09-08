@@ -35,5 +35,13 @@ public class Island : MonoBehaviour {
 		}
 
 	}
+
+	public void resetIsland()
+	{
+		// want the island to sink like all the enemies
+
+		// easy solution
+		Destroy(gameplay);
+	}
 		
 }

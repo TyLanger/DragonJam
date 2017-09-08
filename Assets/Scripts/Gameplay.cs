@@ -71,6 +71,8 @@ public class Gameplay : MonoBehaviour {
 	int currentStage = 0;
 	bool tipDisplayed = false;
 
+	bool playerDead = false;
+
 	// Use this for initialization
 	void Start () {
 		numDeadEnemies = 0;
@@ -78,6 +80,9 @@ public class Gameplay : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (playerDead) {
+			return;
+		}
 		if (gameStages[currentStage].winState != WinState.Start && gameStages[currentStage].winState != WinState.End) {
 			if (Time.time > timeOfNextSpawn) {
 				timeOfNextSpawn = Time.time + timeBetweenSpawns;
@@ -197,6 +202,39 @@ public class Gameplay : MonoBehaviour {
 		initWinState ();
 	}
 
+	public void resetLevel()
+	{
+		playerDead = true;
+
+		// kill all current enemies and restart the level
+		BoatAI[] enemyPirates = FindObjectsOfType<BoatAI> ();
+		if (enemyPirates != null) {
+			foreach (var boat in enemyPirates) {
+				boat.dieFromReset ();
+			}
+		}
+		AlienController[] aliens = FindObjectsOfType<AlienController>();
+		if (aliens != null) {
+			foreach (var a in aliens) {
+				a.dieFromReset ();
+			}
+		}
+		Island spawnedIsland = FindObjectOfType<Island> ();
+		if (spawnedIsland != null) {
+			spawnedIsland.resetIsland ();
+		}
+
+		// reset variables
+		waypointsNotSpawned = true;
+		initWinState ();
+	}
+		
+	public void playerRevived()
+	{
+		// called by the player when they have revived
+		playerDead = false;
+	}
+
 	void initWinState()
 	{
 		WinState currentWinState = gameStages [currentStage].winState;
@@ -225,6 +263,7 @@ public class Gameplay : MonoBehaviour {
 			break;
 
 		case WinState.Survival:
+			gameStages [currentStage].timeToSurvive = gameStages [currentStage].originalTimeToSurvive;
 			timeBetweenSpawns = gameStages [currentStage].survivalTimeBetweenSpawns;
 			gameStages [currentStage].originalTimeToSurvive = gameStages[currentStage].timeToSurvive;
 			break;
