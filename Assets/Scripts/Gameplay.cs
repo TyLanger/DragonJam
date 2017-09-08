@@ -115,6 +115,10 @@ public class Gameplay : MonoBehaviour {
 		}
 		if (gameStages [currentStage].winState == WinState.Survival) {
 			sunLight.intensity = gameStages[currentStage].lightIntensity.Evaluate((gameStages [currentStage].timeToSurvive/gameStages[currentStage].originalTimeToSurvive));
+			sunLight.transform.Rotate (new Vector3 (- (45f / 60f)*Time.deltaTime, 0, 0));
+			if (sunLight.transform.rotation.eulerAngles.x < 5) {
+				sunLight.transform.rotation = Quaternion.Euler(new Vector3 (175, sunLight.transform.rotation.eulerAngles.y, sunLight.transform.rotation.eulerAngles.z));
+			}
 			gameStages [currentStage].timeToSurvive -= Time.deltaTime;
 			if (gameStages [currentStage].timeToSurvive < 30 && !tipDisplayed) {
 				// print the tip message when only 30 seconds left
