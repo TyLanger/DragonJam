@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Ocean : MonoBehaviour {
 
@@ -14,7 +15,7 @@ public class Ocean : MonoBehaviour {
 	public Color DeepColour; //2830D800
 	public Color TroughColour; //0E005A00
 
-
+	public bool flatShading = true;
 	// can go out of bounds it not a square mesh
 	int width = 20;
 	int height = 20;
@@ -106,27 +107,60 @@ public class Ocean : MonoBehaviour {
 	{
 		int vertexIndex = 0;
 		Vector3[] newVerts = mesh.vertices;
-		Color[] colourMap = new Color[width * height];
-		Texture2D texture = new Texture2D(width, height);
+		Color[] colourMap = new Color[width * height]; 
+		Texture2D texture;
+		int[] triangles = mesh.triangles;
+		//Vector2[] uvs = mesh.uv;
 
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
+		// flat shading doens't look right when the mesh is moving along with the player
+		// appear like you are in the same box the whole time
+		if (flatShading) {
+			colourMap = new Color[triangles.Length/6];
+			texture = new Texture2D (width-1, height-1);
+			for (int i = 0; i < triangles.Length; i++) {
+				float newFlatheight = getHeightAtPosition (meshRenderer.transform.position + newVerts [i]);
 
-				//float newHeight = getSinHeight (x, y);
-				float newHeight = getHeightAtPosition(meshRenderer.transform.position + new Vector3(x*scale, 0, y*scale));
-
-				newVerts [vertexIndex] = new Vector3 (newVerts [vertexIndex].x, newHeight, newVerts [vertexIndex].z);
-				colourMap [vertexIndex] = getColourAtHeight (newHeight); //Color.Lerp (Color.gray, Color.blue, newHeight);
-				vertexIndex++;
+				newVerts [i] = new Vector3 (newVerts [i].x, newFlatheight, newVerts [i].z);
+				if (i % 6 == 0) {
+					colourMap [i/6] = getColourAtHeight (newFlatheight);
+				}
 			}
+			mesh.vertices = newVerts;
+			//mesh.uv = flatUVs;
+
+		} else {	
+			texture = new Texture2D (width, height);
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+
+
+					//float newHeight = getSinHeight (x, y);
+					float newHeight = getHeightAtPosition (meshRenderer.transform.position + new Vector3 (x * scale, 0, y * scale));
+					if (!flatShading) {
+						newVerts [vertexIndex] = new Vector3 (newVerts [vertexIndex].x, newHeight, newVerts [vertexIndex].z);
+					}
+					colourMap [vertexIndex] = getColourAtHeight (newHeight); //Color.Lerp (Color.gray, Color.blue, newHeight);
+					vertexIndex++;
+				}
+			}
+			mesh.vertices = newVerts;
 		}
 
-		mesh.vertices = newVerts;
-		mesh.RecalculateNormals ();
-
-
+		//mesh.uv = uvs;
 		texture.SetPixels (colourMap);
 		texture.Apply ();
+
+
+
+
+
+
+		//mesh.vertices = newVerts;
+		//mesh.RecalculateNormals ();
+
+
+		//texture.SetPixels (colourMap);
+		//texture.Apply ();
 
 
 		meshFilter.sharedMesh = mesh;
@@ -189,9 +223,23 @@ public class Ocean : MonoBehaviour {
 			}
 		}
 
-		mesh.vertices = verts;
+		if (flatShading) {
+			Vector3[] flatShadedVerts = new Vector3[triangles.Length];
+			Vector2[] flatUVs = new Vector2[triangles.Length];
+
+			for (int i = 0; i < triangles.Length; i++) {
+				flatShadedVerts [i] = verts [triangles [i]];
+				flatUVs [i] = uvs [triangles [i]];
+				triangles [i] = i;
+			}
+			mesh.vertices = flatShadedVerts;
+			mesh.uv = flatUVs;
+		} else {
+			mesh.vertices = verts;
+			mesh.uv = uvs;
+		}
 		mesh.triangles = triangles;
-		mesh.uv = uvs;
+
 		mesh.RecalculateNormals ();
 		mesh.MarkDynamic ();
 
