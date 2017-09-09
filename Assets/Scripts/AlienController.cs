@@ -44,8 +44,9 @@ public class AlienController : MonoBehaviour {
 			timeToAbduct -= Time.deltaTime;
 			if (timeToAbduct < 0) {
 				// fly away with the crew member
-				abducting = false;
+
 				abduct ();
+				abducting = false;
 				// negative to move in opposite direction from the player
 				// 0.8 to make the ufo travel slower
 				moveDirection = -0.8f;
@@ -77,18 +78,24 @@ public class AlienController : MonoBehaviour {
 
 	void abduct()
 	{
-		// try to abduct a crew member if the player has one
-		// tow the crew member below the space craft
-		if (playerController.loseCrew ()) {
-			haveCrew = true;
-			var crewCopy = Instantiate (crew, visual.transform.position + new Vector3 (0, -1.5f, 0), transform.rotation);
-			crewCopy.transform.parent = visual.transform;
-			crew = crewCopy;
+		// check for abducting again
+		// If the alien just died, it may have made it past the last abducting
+		// This stops the alien from taking the crew and dying, but not dropping the crew
+		if (abducting) {
+			// try to abduct a crew member if the player has one
+			// tow the crew member below the space craft
+			if (playerController.loseCrew ()) {
+				haveCrew = true;
+				var crewCopy = Instantiate (crew, visual.transform.position + new Vector3 (0, -1.5f, 0), transform.rotation);
+				crewCopy.transform.parent = visual.transform;
+				crew = crewCopy;
+			}
 		}
 	}
 
 	void dieFromDamage()
 	{
+		abducting = false;
 		// drop crew member, if any
 		// death animation
 		// Destroy(gameObject);
@@ -97,7 +104,7 @@ public class AlienController : MonoBehaviour {
 			crew.GetComponent<Crew>().drop();
 			crew.transform.parent = null;
 		}
-		abducting = false;
+
 		maxMoveSpeed = 0;
 		Invoke ("destroySelf", 8);
 	}
