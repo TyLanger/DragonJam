@@ -62,6 +62,8 @@ public class Waypoint : MonoBehaviour {
 			// if the target has a health component,
 			// destroy this waypoint when it dies
 			target.GetComponent<Health> ().OnDeath += destroyArrow;
+		} else if (target.GetComponent<Island> () != null) {
+			target.GetComponent<Island> ().arrow = this;
 		}
 	}
 }

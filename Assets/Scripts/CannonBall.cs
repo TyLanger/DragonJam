@@ -20,9 +20,12 @@ public class CannonBall : MonoBehaviour {
 	public AnimationCurve ballHeightCurve;
 	public float distanceAboveWater = 2;
 
+	AudioSource woodImpactSource;
+	public AudioClip[] woodClips;
 	// Use this for initialization
 	void Start () {
 		startPoint = transform.position;
+		woodImpactSource = GetComponent<AudioSource> ();
 	}
 	
 	// Update is called once per frame
@@ -81,6 +84,11 @@ public class CannonBall : MonoBehaviour {
 		//Debug.Log ("Hit something " + col.gameObject);
 		if ((col.GetComponent<Health> () != null) && (col.gameObject != creator)) {
 			col.GetComponent<Health> ().takeDamage (damage);
+			if (woodImpactSource != null) {
+				woodImpactSource.clip = woodClips[Random.Range(0, woodClips.Length)];
+				woodImpactSource.Play ();
+
+			}
 		}
 	}
 

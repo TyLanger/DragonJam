@@ -131,7 +131,7 @@ public class Gameplay : MonoBehaviour {
 		}
 
 		if (gameStages [currentStage].winState == WinState.aToB && !tipDisplayed) {
-			if (Vector3.Distance (player.transform.position, gameStages [currentStage].pointB) < 50) {
+			if (Vector3.Distance (player.transform.position, gameStages [currentStage].pointB) < 30) {
 				shoutMessage (gameStages [currentStage].tipMessage);
 				tipDisplayed = true;
 			}
@@ -190,6 +190,11 @@ public class Gameplay : MonoBehaviour {
 		Debug.Log(message);
 	}
 
+	void endShout()
+	{
+		shoutMessage (gameStages [currentStage].tipMessage);
+	}
+
 	void shoutMessage(string message)
 	{
 		// shout the message as if the crew are saying it
@@ -220,10 +225,7 @@ public class Gameplay : MonoBehaviour {
 				a.dieFromReset ();
 			}
 		}
-		Island spawnedIsland = FindObjectOfType<Island> ();
-		if (spawnedIsland != null) {
-			spawnedIsland.resetIsland ();
-		}
+
 	}
 
 	public void resetLevel()
@@ -232,6 +234,10 @@ public class Gameplay : MonoBehaviour {
 
 		// kill all current enemies and restart the level
 		killAllEnemies();
+		Island spawnedIsland = FindObjectOfType<Island> ();
+		if (spawnedIsland != null) {
+			spawnedIsland.resetIsland ();
+		}
 
 		// reset variables
 		waypointsNotSpawned = true;
@@ -279,6 +285,9 @@ public class Gameplay : MonoBehaviour {
 
 		case WinState.End:
 			// spawn the end message/credits
+			killAllEnemies ();
+			Invoke ("endShout", 1); 
+
 			break;
 		}
 	}

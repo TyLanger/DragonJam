@@ -70,7 +70,7 @@ public class BoatController : MonoBehaviour {
 		// controls the visual part of the boat
 		// makes the boat ride the waves. The collider stays in the same y pos, however
 		// When the boat is sinking, makes it be slightly lower than the wave
-		visual.transform.position = transform.position + new Vector3 (0, ocean.GetComponent<Ocean> ().getHeightAtPosition (transform.position) + (sinking?-(sinkRate*(Time.time - sinkTime)):0), 0);
+		visual.transform.position = transform.position + new Vector3 (0, ocean.GetComponent<Ocean> ().getHeightAtPosition (transform.position) + (sinking?-(2*sinkRate*(Time.time - sinkTime)):0), 0);
 		if (sinking) {
 			// cause the boat's front to turn to the sky
 			visual.transform.rotation = Quaternion.LookRotation (Vector3.RotateTowards (visual.transform.forward, transform.forward + sinkVector, Mathf.Abs(sinkRate*(Time.time - sinkTime)/10), 0.0f));
@@ -118,17 +118,17 @@ public class BoatController : MonoBehaviour {
 	{
 		// reset sinkTime or else the boat will bob back up at ta really fast rate
 		sinking = true;
-		sinkTime = Time.time;
-		sinkRate *= -1;
+		sinkTime = Time.time + 3;
+		sinkRate *= -0.5f;
 		sinkVector = Vector3.zero;
-		Invoke ("stopRising", 2);
+		Invoke ("stopRising", 3);
 	}
 	void stopRising()
 	{
 		Debug.Log ("Manual snap back");
 		// if it doesn't work itself out on its own
 		sinking = false;
-		sinkRate *= -1;
+		sinkRate *= -2;
 		sinkVector = Vector3.up;
 		visual.transform.forward = transform.forward;
 	}

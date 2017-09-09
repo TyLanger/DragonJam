@@ -7,6 +7,7 @@ public class Island : MonoBehaviour {
 	public GameObject ocean;
 	public GameObject visual;
 	public Gameplay gameplay;
+	public Waypoint arrow;
 
 	public float distanceUnderWater; 
 
@@ -39,7 +40,7 @@ public class Island : MonoBehaviour {
 	public void resetIsland()
 	{
 		// want the island to sink like all the enemies
-
+		arrow.destroyArrow();
 		// easy solution
 		Destroy(gameObject);
 	}
