@@ -28,7 +28,8 @@ public class BoatController : MonoBehaviour {
 	public GameObject ocean;
 
 	string[] abductionMessages = { "They took ", "Crew down", "WTF", "I miss him already", "Get him back", "Aliens?!?!" };
-	string[] names = { "Larry", "One-eyed Pete", "New guy", "Henry", "Iron hook", "my dog", };
+	string[] names = { "Larry", "One-eyed Pete", "New guy", "Henry", "Iron hook", "my dog" };
+	string[] deathWords = { "We're going down", "Too much damage", "To Davy Jones' locker", "Cap'n, you've doomed us all", "It was an honour sailing with ye lads", "A watery grave" };
 	public TextMesh crewText;
 	public int numberOfCrew = 1;
 	public float fireSpeedBonusPerCrew;
@@ -108,6 +109,8 @@ public class BoatController : MonoBehaviour {
 
 	public void sinkPlayer()
 	{
+		TextMesh deathWordCopy = Instantiate (crewText, transform.position, FindObjectOfType<CameraController> ().transform.rotation);
+		deathWordCopy.text = deathWords [Random.Range (0, deathWords.Length)];
 		sinking = true;
 		sinkTime = Time.time;
 		// don't destroy the boat
@@ -121,12 +124,15 @@ public class BoatController : MonoBehaviour {
 		sinkTime = Time.time + 3;
 		sinkRate *= -0.5f;
 		sinkVector = Vector3.zero;
+		// reset the crew to the default
+		// if I keep the crew after I die, it could make it slightly easier
+		// already easy enough with how you can get crew when all enemies are killed
+		numberOfCrew = 1;
 		Invoke ("stopRising", 3);
 	}
 	void stopRising()
 	{
-		Debug.Log ("Manual snap back");
-		// if it doesn't work itself out on its own
+		// set it back exactly where it should be
 		sinking = false;
 		sinkRate *= -2;
 		sinkVector = Vector3.up;
