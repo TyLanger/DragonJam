@@ -17,6 +17,13 @@ public class AlienController : MonoBehaviour {
 	bool abducting = false;
 	bool haveCrew = false;
 	public GameObject crew;
+	bool sinking = false;
+	// minimum sink rate needed to drop 5 units in y in 8 sec
+	// 5 because that's what makes it look under water
+	float sinkRate = 0.625f;
+	float timeStartedSinking;
+	Vector3 sinkVector = new Vector3 (0, -2, 0);
+	float sinkAngleRate = 0.01f;
 
 	// tractor beam
 	// distance the ship has to be in order to channel the tractor beam
@@ -25,6 +32,7 @@ public class AlienController : MonoBehaviour {
 	public float escapeDistance;
 	public GameObject tractorBeam;
 	Vector3 lockOnPosition;
+	bool alive = true;
 
 	// Use this for initialization
 	void Start () {
@@ -56,7 +64,7 @@ public class AlienController : MonoBehaviour {
 			transform.position = Vector3.MoveTowards (transform.position, player.transform.position, moveDirection * maxMoveSpeed);
 		}
 
-		if ((Vector3.Distance (transform.position, player.transform.position) < tractorBeamRange) && !abducting && !haveCrew) {
+		if ((Vector3.Distance (transform.position, player.transform.position) < tractorBeamRange) && !abducting && !haveCrew && alive) {
 			// now in range
 			// just latch on to this position
 
@@ -73,7 +81,16 @@ public class AlienController : MonoBehaviour {
 			destroySelf();
 		}
 
-		visual.transform.position = transform.position + new Vector3(0, ocean.GetComponent<Ocean>().getHeightAtPosition(transform.position) + hoverHeight, 0);
+		if (!sinking) {
+			visual.transform.position = transform.position + new Vector3 (0, ocean.GetComponent<Ocean> ().getHeightAtPosition (transform.position) + hoverHeight, 0);
+		} else {
+			// multiply the sink rate by 2 to make it go down faster
+			// Need to go down faster to sync up with the rotation
+			// slower rotation looks weird
+			// also, rotations are hard so it's easier to adjust the position
+			visual.transform.position = transform.position + new Vector3 (0, ocean.GetComponent<Ocean> ().getHeightAtPosition (transform.position) + hoverHeight - 2*sinkRate * (Time.time - timeStartedSinking), 0);
+			visual.transform.rotation = Quaternion.LookRotation (Vector3.RotateTowards (visual.transform.forward, transform.forward + sinkVector, sinkAngleRate, 0.0f));
+		}
 	}
 
 	void abduct()
@@ -93,9 +110,16 @@ public class AlienController : MonoBehaviour {
 		}
 	}
 
+	void sink()
+	{
+		// tilt to one side, then fall into the water
+		sinking = true;
+		timeStartedSinking = Time.time;
+	}
+
 	void dieFromDamage()
 	{
-		abducting = false;
+		dieFromReset ();
 		// drop crew member, if any
 		// death animation
 		// Destroy(gameObject);
@@ -105,14 +129,17 @@ public class AlienController : MonoBehaviour {
 			crew.transform.parent = null;
 		}
 
-		maxMoveSpeed = 0;
-		Invoke ("destroySelf", 8);
+
 	}
 
 	public void dieFromReset()
 	{
+		sink ();
+		alive = false;
 		abducting = false;
-		maxMoveSpeed = 0;
+		transform.parent = null;
+		// slowly move forwards
+		maxMoveSpeed *= 0.2f;
 		Invoke ("destroySelf", 8);
 	}
 
