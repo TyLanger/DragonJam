@@ -34,6 +34,8 @@ public class AlienController : MonoBehaviour {
 	Vector3 lockOnPosition;
 	bool alive = true;
 
+	AudioSource audioSource;
+
 	// Use this for initialization
 	void Start () {
 		if (player == null) {
@@ -41,6 +43,7 @@ public class AlienController : MonoBehaviour {
 		}
 		playerController = player.GetComponent<BoatController> ();
 		GetComponent<Health> ().OnDeath += dieFromDamage;
+		audioSource = GetComponent<AudioSource> ();
 	}
 	
 	// Update is called once per frame
@@ -72,6 +75,7 @@ public class AlienController : MonoBehaviour {
 			abducting = true;
 			transform.parent = player.transform;
 			tractorBeam.SetActive (true);
+			audioSource.Play ();
 		}
 
 		if (haveCrew && Vector3.Distance (transform.position, player.transform.position) > escapeDistance) {
@@ -98,6 +102,7 @@ public class AlienController : MonoBehaviour {
 		// check for abducting again
 		// If the alien just died, it may have made it past the last abducting
 		// This stops the alien from taking the crew and dying, but not dropping the crew
+		audioSource.Stop();
 		if (abducting) {
 			// try to abduct a crew member if the player has one
 			// tow the crew member below the space craft
