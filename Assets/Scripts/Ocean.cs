@@ -55,7 +55,7 @@ public class Ocean : MonoBehaviour {
 		}
 	}
 
-	Color getColourAtHeight(float height)
+	public Color getColourAtHeight(float height)
 	{
 		// put height in the range of -1 to 1
 		height /= waveAmplitude;

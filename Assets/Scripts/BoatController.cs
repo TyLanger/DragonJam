@@ -40,11 +40,15 @@ public class BoatController : MonoBehaviour {
 	int healThreshold = 5;
 	Health health;
 
+	AudioSource audioSource;
+	public AudioClip[] bubbles;
+
 	// Use this for initialization
 	void Start () {
 		currentMoveSpeed = maxMoveSpeed;
 		health = GetComponent<Health> ();
 		sinkVector = new Vector3 (0, 1, 0);
+		audioSource = GetComponent<AudioSource> ();
 	}
 	
 	// Update is called once per frame
@@ -104,6 +108,8 @@ public class BoatController : MonoBehaviour {
 	{
 		sinking = true;
 		sinkTime = Time.time;
+		audioSource.clip = bubbles [Random.Range (0, bubbles.Length)];
+		audioSource.Play ();
 		Invoke ("destroyBoat", 8);
 	}
 

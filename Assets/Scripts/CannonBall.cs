@@ -15,13 +15,18 @@ public class CannonBall : MonoBehaviour {
 
 	GameObject creator;
 
-	GameObject ocean;
+	Ocean ocean;
 	public GameObject visual;
 	public AnimationCurve ballHeightCurve;
 	public float distanceAboveWater = 2;
 
+	public GameObject splash;
+	bool notSplashed = true;
+
 	AudioSource woodImpactSource;
 	public AudioClip[] woodClips;
+
+	public AudioClip[] splashes;
 	// Use this for initialization
 	void Start () {
 		startPoint = transform.position;
@@ -44,7 +49,28 @@ public class CannonBall : MonoBehaviour {
 		transform.position = Vector3.MoveTowards (transform.position, targetPoint, moveSpeed);
 
 
-		visual.transform.position = transform.position + new Vector3 (0, ocean.GetComponent<Ocean> ().getHeightAtPosition (transform.position) + ballHeightCurve.Evaluate(Vector3.Distance(transform.position, startPoint)/totalDistance), 0);
+		visual.transform.position = transform.position + new Vector3 (0, ocean.getHeightAtPosition (transform.position) + ballHeightCurve.Evaluate(Vector3.Distance(transform.position, startPoint)/totalDistance), 0);
+		/*
+		 * The particle system on the spash doesn't look great
+		 * Colours still aren't right
+		 */
+		if (visual.transform.position.y < ocean.getHeightAtPosition (transform.position) && notSplashed) {
+
+			woodImpactSource.clip = splashes [Random.Range(0, splashes.Length)];
+			//woodImpactSource.
+			woodImpactSource.Play ();
+			notSplashed = false;
+			/*
+			var splashCopy = Instantiate (splash, visual.transform.position, visual.transform.rotation);
+			//splashCopy.transform.parent = transform;
+			var mainModule = splashCopy.GetComponent<ParticleSystem> ().main;
+			mainModule.startColor = ocean.getColourAtHeight (ocean.getHeightAtPosition(transform.position));
+			//var emitParams = new ParticleSystem.EmitParams ();
+			//emitParams.startColor = ocean.GetComponent<Ocean> ().getColourAtHeight (visual.transform.position.y);
+			//splashCopy.GetComponent<ParticleSystem> ().main.startColor = ocean.GetComponent<Ocean> ().getColourAtHeight (visual.transform.position.y);
+			notSplashed = false;
+			*/
+		}
 	}
 
 	public void setTargetPoint(Vector3 point)
@@ -60,11 +86,12 @@ public class CannonBall : MonoBehaviour {
 
 	public void setOcean(GameObject o)
 	{
-		ocean = o;
+		ocean = o.GetComponent<Ocean>();
 	}
 
 	void despawn()
 	{
+		
 		// turn off the collider so it does nothing
 		GetComponent<SphereCollider> ().enabled = false;
 		// make the cannonball dissappear below the water
@@ -87,7 +114,8 @@ public class CannonBall : MonoBehaviour {
 			if (woodImpactSource != null) {
 				woodImpactSource.clip = woodClips[Random.Range(0, woodClips.Length)];
 				woodImpactSource.Play ();
-
+				// don't also play the splash sound
+				notSplashed = false;
 			}
 		}
 	}
