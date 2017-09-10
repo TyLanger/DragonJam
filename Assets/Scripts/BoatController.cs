@@ -42,6 +42,8 @@ public class BoatController : MonoBehaviour {
 
 	AudioSource audioSource;
 	public AudioClip[] bubbles;
+	//public AudioClip[] cannonFire;
+	//public float cannonPitch;
 
 	// Use this for initialization
 	void Start () {
@@ -182,6 +184,14 @@ public class BoatController : MonoBehaviour {
 			ballClone.GetComponent<CannonBall> ().setOcean (ocean);
 			ballClone.GetComponent<CannonBall> ().setCreator (gameObject);
 			ballClone.GetComponent<CannonBall> ().setTargetPoint (aimPoint);
+			
+			// This works to make a cannon sound, but I don't have any good cannon sounds 
+			/*
+			audioSource.clip = cannonFire [Random.Range (0, cannonFire.Length)];
+			audioSource.pitch = cannonPitch;
+			audioSource.Play ();
+			audioSource.pitch = 1;
+			*/
 		}
 	}
 

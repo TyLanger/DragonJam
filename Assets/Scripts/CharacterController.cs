@@ -10,11 +10,12 @@ public class CharacterController : MonoBehaviour {
 	Vector3 aimPoint;
 	bool dead = false;
 
-
+	public Transform cursor;
 
 	// Use this for initialization
 	void Start () {
 		GetComponent<Health> ().OnDeath += playerDeath;
+		Cursor.visible = false;
 	}
 	
 	// Update is called once per frame
@@ -32,6 +33,7 @@ public class CharacterController : MonoBehaviour {
 
 		if (aimPlane.Raycast (CameraRay, out cameraDistance)) {
 			aimPoint = CameraRay.GetPoint (cameraDistance);
+			cursor.position = aimPoint;
 		}
 
 
