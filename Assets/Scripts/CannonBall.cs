@@ -21,7 +21,9 @@ public class CannonBall : MonoBehaviour {
 	public float distanceAboveWater = 2;
 
 	public GameObject splash;
+	public Vector3 splashHeight;
 	bool notSplashed = true;
+	GameObject splashToDestroy;
 
 	AudioSource woodImpactSource;
 	public AudioClip[] woodClips;
@@ -60,16 +62,20 @@ public class CannonBall : MonoBehaviour {
 			//woodImpactSource.
 			woodImpactSource.Play ();
 			notSplashed = false;
-			/*
-			var splashCopy = Instantiate (splash, visual.transform.position, visual.transform.rotation);
+
+			var splashCopy = Instantiate (splash, visual.transform.position + splashHeight, visual.transform.rotation);
+			splashToDestroy = splashCopy;
+
+			// this doesn't seem to work
+			// might be overwriting it with the material?
 			//splashCopy.transform.parent = transform;
-			var mainModule = splashCopy.GetComponent<ParticleSystem> ().main;
-			mainModule.startColor = ocean.getColourAtHeight (ocean.getHeightAtPosition(transform.position));
+			//var mainModule = splashCopy.GetComponent<ParticleSystem> ().main;
+			//mainModule.startColor = ocean.getColourAtHeight (ocean.getHeightAtPosition(transform.position));
 			//var emitParams = new ParticleSystem.EmitParams ();
 			//emitParams.startColor = ocean.GetComponent<Ocean> ().getColourAtHeight (visual.transform.position.y);
 			//splashCopy.GetComponent<ParticleSystem> ().main.startColor = ocean.GetComponent<Ocean> ().getColourAtHeight (visual.transform.position.y);
-			notSplashed = false;
-			*/
+			//notSplashed = false;
+
 		}
 	}
 
@@ -103,6 +109,7 @@ public class CannonBall : MonoBehaviour {
 
 	void destroyCannonball()
 	{
+		Destroy (splashToDestroy);
 		Destroy (gameObject);
 	}
 
