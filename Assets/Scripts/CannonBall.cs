@@ -20,10 +20,16 @@ public class CannonBall : MonoBehaviour {
 	public AnimationCurve ballHeightCurve;
 	public float distanceAboveWater = 2;
 
+	// water splash particle
 	public GameObject splash;
 	public Vector3 splashHeight;
 	bool notSplashed = true;
 	GameObject splashToDestroy;
+
+	// wood impact particle
+	public GameObject woodImpactParticle;
+	public Vector3 woodParticleHeight;
+	GameObject woodToDestroy;
 
 	AudioSource woodImpactSource;
 	public AudioClip[] woodClips;
@@ -109,6 +115,9 @@ public class CannonBall : MonoBehaviour {
 
 	void destroyCannonball()
 	{
+		if (woodToDestroy != null) {
+			Destroy (woodToDestroy);
+		}
 		Destroy (splashToDestroy);
 		Destroy (gameObject);
 	}
@@ -123,6 +132,8 @@ public class CannonBall : MonoBehaviour {
 				woodImpactSource.Play ();
 				// don't also play the splash sound
 				notSplashed = false;
+				var woodCopy = Instantiate (woodImpactParticle, visual.transform.position + woodParticleHeight, visual.transform.rotation);
+				woodToDestroy = woodCopy;
 			}
 		}
 	}

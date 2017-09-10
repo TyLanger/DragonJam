@@ -20,11 +20,11 @@ public class CharacterController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (dead) {
-			return;
+		
+		if (!dead) {
+			boat.adjustThrottle (Input.GetAxisRaw ("Vertical"));
+			boat.steer (Input.GetAxisRaw ("Horizontal"));
 		}
-		boat.adjustThrottle (Input.GetAxisRaw ("Vertical"));
-		boat.steer (Input.GetAxisRaw ("Horizontal"));
 
 		Ray CameraRay = Camera.main.ScreenPointToRay (Input.mousePosition);
 		Plane aimPlane = new Plane (Vector3.up, Vector3.zero);
@@ -37,7 +37,7 @@ public class CharacterController : MonoBehaviour {
 		}
 
 
-		if (Input.GetButtonDown ("Fire1")) {
+		if (Input.GetButtonDown ("Fire1") && !dead) {
 			// left click
 			boat.Shoot(aimPoint);
 		}
@@ -46,6 +46,7 @@ public class CharacterController : MonoBehaviour {
 	void playerDeath()
 	{
 		Debug.Log ("You have died");
+		dead = true;
 		gameplay.resetLevel ();
 		boat.sinkPlayer ();
 		Invoke ("revive", 8);
